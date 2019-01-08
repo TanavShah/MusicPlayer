@@ -3,14 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    android:background="@drawable/bckg1"
     android:orientation="vertical"
-    android:background="#8AF3F3"
-    tools:context=".MainActivity" >
+    tools:context=".MainActivity">
 
     <ListView
         android:id="@+id/song_list"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="match_parent"
+        android:alpha="12"
+        android:divider="#021535"
+        android:dividerHeight="1dp"
+        android:padding="2dp"
+        android:text="@string/register"
+        tools:cacheColorHint="#3ED5C1">
+
     </ListView>
 
 </LinearLayout>

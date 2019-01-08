@@ -2,4 +2,10 @@
     <string name="app_name">Music Player</string>
     <string name="shuffle">Shuffle</string>
     <string name="end">End</string>
+    <string name="register"><color>#3ED5C1</color><b>Copyright</b></string>
+    <string name="previous"> musicSrv.playPrev()</string>
+
+    <string name="playNext"> musicSrv.playNext();</string>
+    <string name="songname">songTitle</string>
+    <string name="artistname">songArtist</string>
 </resources>

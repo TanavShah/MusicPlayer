@@ -5,7 +5,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentUris;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +20,10 @@ import android.net.Uri;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.os.IBinder;
 import android.content.ComponentName;
@@ -28,6 +33,7 @@ import android.content.ServiceConnection;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.MediaController.MediaPlayerControl;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity implements MediaPlayerControl {
@@ -39,13 +45,27 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     private boolean musicBound=false;
     private MusicController controller;
     private boolean paused=false, playbackPaused=false;
-
-
+    private String sname;
+    private String thisTitle;
+    private String thisArtist;
+    private MediaPlayer p1;
+    private Boolean isSelected;
+    private Boolean forcolour = false;
+    public static MainActivity instance;
 
     public void getSongList() {
         //retrieve song info
     }
 
+/*
+    public void listequal(ListView lv)
+    {
+        for(int i = 0;i<songList.size();i++)
+        {
+            lv.getChildAt(i) = songView.getChildAt(i);
+        }
+    }
+*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
         songView = findViewById(R.id.song_list);
         songList = new ArrayList<Song>();
 
+
         ContentResolver musicResolver = getContentResolver();
         Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
@@ -99,8 +120,8 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                     (android.provider.MediaStore.Audio.Media.ARTIST);
             while (musicCursor.moveToNext()) {
                 long thisId = musicCursor.getLong(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
+                thisTitle = musicCursor.getString(titleColumn);
+                thisArtist = musicCursor.getString(artistColumn);
                 songList.add(new Song(thisId, thisTitle, thisArtist));
             }
         }
@@ -123,6 +144,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
 
     }
+
+
+
+
+
 
     private ServiceConnection musicConnection = new ServiceConnection(){
 
@@ -150,12 +176,22 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             playIntent = new Intent(this, MusicService.class);
             bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
             startService(playIntent);
+
+
         }
     }
 
 
 
     public void songPicked(View view){
+/*
+        int color1 = Color.parseColor("#8AF3F3");
+        for(int i=0;i<songList.size();i++)
+        {
+            view.setBackgroundColor(color1);
+        }
+*/
+
 
         musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
         Log.e("aftsongpic","songpic");
@@ -164,21 +200,107 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             musicSrv.playSong();
             Log.e("aftsongpic","plysng");
 
+/*
+        if(musicSrv.isPng() == true)
+        {
+            int color = Color.parseColor("#E19D36");
+            view.setBackgroundColor(color);
+            Log.e("aftsongpic" , "colour");
+        }
+        else
+        {
+            int color1 = Color.parseColor("#8AF3F3");
+            view.setBackgroundColor(color1);
+            Log.e("aftsongpic" , "colour1");
+        }
 
+*/
 
             if (playbackPaused) {
                 setController();
-
                 Log.e("aftsongpic","stctrl");
                 playbackPaused = false;
                 Log.e("aftsongpic","plb paused");
             }
 
+        int Posn = musicSrv.getPosn();
+        //int songPosn = p1.getCurrentPosition();
+        Song plySong = songList.get(Posn);
+
+        String songTitle = plySong.getTitle();
+        String songArtist = plySong.getArtist();
+        long currSong = plySong.getID();
+        Uri trackUri = ContentUris.withAppendedId(
+                android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                currSong);
+        try {
+            p1.setDataSource(getApplicationContext(), trackUri);
+        } catch (Exception e) {
+            Log.e("MUSIC SERVICE", "Error setting data source", e);
+        }
 
 
+        int color = Color.parseColor("#74C9CB");
+        int color1 = Color.parseColor("#8AF3F3");
+       // int position = musicSrv.getPosn();
+        //musicSrv.setSong(position);
+       // int position = getCurrentPosition();
+        int position;
+        if(musicSrv!=null && musicBound==true && musicSrv.isPng())
+        {
+            position = musicSrv.getPosn();
+            Log.e("aftsongpic","setpos");
+        }
+        else
+        {
+            position = 0;
+        }
+        String log1 = Integer.toString(position);
+        Log.e("aftsongpic",log1);
+        for (int i = 0; i < songList.size(); i++) {
+            if (i == position) {
+                View v1 =  songView.getChildAt(i);
+               // v1.setBackgroundColor(color);
+                Log.e("aftsongpic" , "colour");
+            }// else {
+               // View v2 =  songView.getChildAt(i);
+               // v2.setBackgroundColor(color1);
+                //Log.e("aftsongpic" , "colour1");
+            //}
+        }
 
+
+        Intent i = new Intent(MainActivity.this, MusicService.class);
+        //String strName = null;
+        //i.putExtra(Intent.EXTRA_TEXT, strName);
+        i.putExtra("name", songTitle);
+        i.putExtra("name1" , songArtist);
+        startService(i);
+
+        controller.getBottom();
+        controller.getScaleX();
+        controller.getScaleY();
             controller.show(0);
+
+
         Log.e("aftsongpic","cshow");
+
+
+
+
+      //  songView = findViewById(R.id.song_list);
+        //songList = new ArrayList<Song>();
+        //songView.getDefaultFocusHighlightEnabled();
+
+
+        //int color = Color.parseColor("#E3AB33");
+        //view.setBackgroundColor(color);
+       // view.setHovered(true);
+
+
+
+
+
     }
 
 
@@ -199,6 +321,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
 
             @Override
             public void onClick(View v) {
+
                 playNext();
             }
         }, new View.OnClickListener() {
@@ -207,15 +330,27 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
                 playPrev();
             }
         });
+        int color11 = Color.parseColor("#087689");
         controller.setMediaPlayer(this);
         controller.setAnchorView(findViewById(R.id.song_list));
         controller.setEnabled(true);
+        controller.getSolidColor();
+        controller.setBottom(0);
+
+        //controller.setBackgroundColor(color11);
+        //controller.setBottom(0);
+
     }
 
     private void playNext(){
 
+
+
+
             musicSrv.playNext();
             Log.e("aftsongpic","plynxt");
+
+
 
 
         if(playbackPaused){
@@ -223,6 +358,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             playbackPaused=false;
         }
         controller.show(0);
+        controller.getBottom();
+        controller.getScaleX();
+        controller.getScaleY();
     }
 
     private void playPrev(){
@@ -236,6 +374,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             playbackPaused=false;
         }
         controller.show(0);
+        controller.getBottom();
+        controller.getScaleX();
+        controller.getScaleY();
     }
 
     @Override
@@ -274,7 +415,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     @Override
     public void seekTo(int pos) {
 
-            musicSrv.pausePlayer();
+            musicSrv.seek(pos);
             Log.e("aftsongpic","mspauseply1");
 
 
@@ -333,6 +474,10 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
     }
 
 
+
+
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -347,7 +492,11 @@ public class MainActivity extends AppCompatActivity implements MediaPlayerContro
             case R.id.action_shuffle:
                     musicSrv.setShuffle();
                     Log.e("aftsongpic","msshuffle");
-
+                    controller.show();
+                Toast t3 = Toast.makeText(getApplicationContext(),
+                        "Press Shuffle Button Again To Enter/Exit Shuffle Mode",
+                        Toast.LENGTH_SHORT);
+                    t3.show();
 
                 break;
             case R.id.action_end:
