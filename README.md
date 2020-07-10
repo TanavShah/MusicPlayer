@@ -22,3 +22,14 @@ Other features include a shuffle button as a menu item in the action bar of the 
 
 Another menu item shows an exit button for the app.
 
+## Demo
+
+### Music Player
+
+![Screenshot_20200710-162734__01](/Screenshot_20200710-162734__01.jpg)
+![Screenshot_20200710-162728__01__01](/Screenshot_20200710-162728__01__01.jpg)
+
+### Notification
+
+![Screenshot_20200710-162636](/Screenshot_20200710-162636.jpg)
+
