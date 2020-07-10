@@ -26,10 +26,9 @@ Another menu item shows an exit button for the app.
 
 ### Music Player
 
-![Screenshot_20200710-162734__01](/Screenshot_20200710-162734__01.jpg)
-![Screenshot_20200710-162728__01__01](/Screenshot_20200710-162728__01__01.jpg)
+<img src= "https://github.com/TanavShah/MusicPlayer/blob/master/Screenshot_20200710-162734__01.jpg" width="108" height = "220">
+<img src= "https://github.com/TanavShah/MusicPlayer/blob/master/Screenshot_20200710-162728__01__01.jpg" width="108" height = "220">
 
 ### Notification
 
-![Screenshot_20200710-162636](/Screenshot_20200710-162636.jpg)
-
+<img src= "https://github.com/TanavShah/MusicPlayer/blob/master/Screenshot_20200710-162636.jpg" width="108" height = "220">
